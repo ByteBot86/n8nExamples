@@ -1,2 +1,3 @@
 # n8nExamples
-n8nExamples
+
+Listo of example projects in n8n 
