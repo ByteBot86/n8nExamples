@@ -1,0 +1,516 @@
+{
+  "name": "4 Allegro",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -32,
+        32
+      ],
+      "id": "367749a4-d45f-400f-b8f4-7044020a5d1a",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.allegro.pl.allegrosandbox.pl/offers/listing?phrase=ser&marketplaceId=allegro-pl&shipping.country=PL&currency=PLN&searchMode=REGULAR&offset={{ $json.offset }}&limit={{ $json.limit }}&sort=relevance ",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "oAuth2Api",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/vnd.allegro.public.v1+json"
+            },
+            {
+              "name": "Accept-Language",
+              "value": "pl-PL"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        432,
+        -48
+      ],
+      "id": "981438e3-b513-4bf2-8490-afe6a2795f1d",
+      "name": "Allegro offers",
+      "credentials": {
+        "oAuth2Api": {
+          "id": "9ucfnczKTw1lHI9H",
+          "name": "Allegro Sandbox"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "8424616340",
+        "text": "=Product:{{ $json.fields.Name }} price {{ $json.fields.Price }} added",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1520,
+        -240
+      ],
+      "id": "44f0c250-f218-4380-8152-5700da4b4e8e",
+      "name": "Send a text message",
+      "webhookId": "4a05d6e5-278e-40f9-8b99-eb108e6e67bf",
+      "credentials": {
+        "telegramApi": {
+          "id": "8UEdXallquA9X1Rq",
+          "name": "Telegram n8n test bot account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "airtableOAuth2Api",
+        "operation": "upsert",
+        "base": {
+          "__rl": true,
+          "value": "appwAWv3Q9PMNlH0a",
+          "mode": "list",
+          "cachedResultName": "TestApp",
+          "cachedResultUrl": "https://airtable.com/appwAWv3Q9PMNlH0a"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblmKVsu2julMMt1O",
+          "mode": "list",
+          "cachedResultName": "Products",
+          "cachedResultUrl": "https://airtable.com/appwAWv3Q9PMNlH0a/tblmKVsu2julMMt1O"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "allegroId": "={{ $json.id }}",
+            "Price": "={{ $json.delivery.lowestPrice.amount }}",
+            "Name": "={{ $json.name }}"
+          },
+          "matchingColumns": [
+            "allegroId"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            },
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Todo",
+                  "value": "Todo"
+                },
+                {
+                  "name": "In progress",
+                  "value": "In progress"
+                },
+                {
+                  "name": "Done",
+                  "value": "Done"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Price",
+              "displayName": "Price",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "allegroId",
+              "displayName": "allegroId",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        1520,
+        -48
+      ],
+      "id": "dc921d16-4af4-41f9-b74a-04a7e6102cc7",
+      "name": "Create or update a record1",
+      "credentials": {
+        "airtableOAuth2Api": {
+          "id": "q0rdYtVN2kJpwahI",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        1296,
+        -96
+      ],
+      "id": "b806a637-5f99-422c-bf6b-9b024542d708",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "result.items.promoted",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        1072,
+        -96
+      ],
+      "id": "575c29c6-7fea-4dcd-8f3b-f5d9d48ea514",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Loop over input items and add a new field called 'myNewField' to \n\n// console.log($('initLoop').item.json.limit)\n\n// console.log($('initLoop').item.json.offset)\nconst response = $input.item.json;\nlet params;\ntry {\n  params = $('convert to single element').item.json;\n} catch (e) {\n  params = $('initLoop').item.json;\n}\nconsole.log(\"params\")\nconsole.log(params)\nconst myLimit = 3\nconst newOffset = params.offset + params.limit\n\nconsole.log(newOffset)\nvar shouldContinue = false\nif(newOffset<12){\n  shouldContinue = true\n}\nelse{\n  shouldContinue = false\n}\n\nreturn {\n  json: {\n    result:response,\n    offset: newOffset,\n    limit: myLimit,\n    _shouldContinue: shouldContinue\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        656,
+        -128
+      ],
+      "id": "8c7386b1-a112-4b10-b5e9-6c3a5ab18967",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "8b317d9e-558b-458e-a3b2-f1f94d81fa96",
+              "leftValue": "={{ $json._shouldContinue }}",
+              "rightValue": false,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        848,
+        -96
+      ],
+      "id": "0631d452-656e-4f78-8c73-fe5f3f225777",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e1fd130d-393c-4103-87e2-73e2327811a3",
+              "name": "offset",
+              "value": "={{ $('Code in JavaScript').item.json.offset }}",
+              "type": "number"
+            },
+            {
+              "id": "82fd27c2-900f-4972-a96f-383f8db888da",
+              "name": "limit",
+              "value": "={{ $('Code in JavaScript').item.json.limit }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1744,
+        -64
+      ],
+      "id": "aff53098-c270-4adb-8240-ca46d2f470ff",
+      "name": "nextOffset"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "21dea0c7-6e2c-4cb0-859e-a58bf195e325",
+              "name": "limit",
+              "value": 3,
+              "type": "number"
+            },
+            {
+              "id": "e2e30f52-60d5-4f74-9863-6e0dcd55572b",
+              "name": "offset",
+              "value": 0,
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        176,
+        32
+      ],
+      "id": "94b3c173-6e30-4f76-a6c3-df45e866bd85",
+      "name": "initLoop"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Loop over input items and add a new field called 'myNewField' to the JSON of each one\n// console.log(\"tutaj\")\n// console.log($input.all()[0].json.limit)\n\n\n\nreturn {\n  json: {\n    limit:$input.all()[$input.all().length -1].json.limit,\n    offset: $input.all()[$input.all().length -1].json.offset    \n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1920,
+        0
+      ],
+      "id": "0f087bbd-641e-4543-a9ef-37e798367caf",
+      "name": "convert to single element"
+    },
+    {
+      "parameters": {
+        "path": "a5c6c982-cc66-4928-910b-db3f171dbb4a",
+        "responseMode": "lastNode",
+        "responseData": "allEntries",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -16,
+        208
+      ],
+      "id": "d54d88b4-5461-4185-a9b3-7edebcddddb0",
+      "name": "Webhook",
+      "webhookId": "a5c6c982-cc66-4928-910b-db3f171dbb4a"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "initLoop",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Allegro offers": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create or update a record1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create or update a record1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a text message": {
+      "main": [
+        [
+          {
+            "node": "nextOffset",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "nextOffset": {
+      "main": [
+        [
+          {
+            "node": "convert to single element",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "initLoop": {
+      "main": [
+        [
+          {
+            "node": "Allegro offers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "convert to single element": {
+      "main": [
+        [
+          {
+            "node": "Allegro offers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "initLoop",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "6027dbad-33f4-49f8-a822-fbf612f5064d",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "09373dc29972a821f2f36cf9017baede51510d6d820d175935c22f645f9e4095"
+  },
+  "id": "NLz15v-Arpu51TKAmMGMy",
+  "tags": []
+}
