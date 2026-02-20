@@ -1,0 +1,206 @@
+{
+  "name": "5 Personal Agent Subworkflow Email Tool",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "query"
+            }
+          ]
+        }
+      },
+      "id": "c055762a-8fe7-4141-a639-df2372f30060",
+      "typeVersion": 1.1,
+      "name": "When Executed by Another Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "position": [
+        272,
+        352
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.query }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        480,
+        352
+      ],
+      "id": "db064494-e602-4b36-83c6-877c591af983",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('To', ``, 'string') }}",
+        "subject": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Subject', ``, 'string') }}",
+        "message": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message', ``, 'string') }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.2,
+      "position": [
+        656,
+        688
+      ],
+      "id": "3699756a-f5b0-46b4-a319-658d88aad6de",
+      "name": "Send",
+      "webhookId": "adc831ab-da65-4f8b-bb4c-36ed5b5c3838",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "9271P5UsyzP0x9KR",
+          "name": "Gmail Oauth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "messageId": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message_ID', ``, 'string') }}"
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.2,
+      "position": [
+        768,
+        560
+      ],
+      "id": "25161333-e039-4e09-9d81-d68c209a5a72",
+      "name": "Get",
+      "webhookId": "e2c84dec-9c7a-45b3-8445-9740de56f640",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "9271P5UsyzP0x9KR",
+          "name": "Gmail Oauth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-5-mini"
+        },
+        "builtInTools": {},
+        "options": {
+          "reasoningEffort": "low"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        352,
+        560
+      ],
+      "id": "32ebb38f-ca92-4041-ba0e-6a0cf31c347b",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "kkj14qnD4cBwY9wg",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "returnAll": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Return_All', ``, 'boolean') }}",
+        "simple": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Simplify', ``, 'boolean') }}",
+        "filters": {},
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.2,
+      "position": [
+        528,
+        576
+      ],
+      "id": "3a0f6595-8e4b-4952-8dde-3a2b9b92cd66",
+      "name": "Get many messages",
+      "webhookId": "2a5e4830-481c-4ebb-a5b6-17a9df8ea7fe",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "9271P5UsyzP0x9KR",
+          "name": "Gmail Oauth account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many messages": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "e8a28338-7722-4f53-bb06-6609e5043b11",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "09373dc29972a821f2f36cf9017baede51510d6d820d175935c22f645f9e4095"
+  },
+  "id": "66WiepNDdwJyBJtl",
+  "tags": []
+}

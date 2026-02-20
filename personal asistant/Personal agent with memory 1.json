@@ -1,0 +1,376 @@
+{
+  "name": "Personal agent with memory 1",
+  "nodes": [
+    {
+      "parameters": {
+        "public": true,
+        "initialMessages": "Cześć! 👋\nJak mogę pomóc?",
+        "options": {
+          "responseMode": "streaming"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -256,
+        -48
+      ],
+      "id": "d90a6b0c-986d-453b-bc71-5564f28e644b",
+      "name": "When chat message received",
+      "webhookId": "1488c8a6-42c5-4708-b2b6-19ae9cc94adf"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.promptUser }}",
+        "needsFallback": true,
+        "options": {
+          "systemMessage": "={{ $json.promptSystem }}",
+          "enableStreaming": true
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        448,
+        -48
+      ],
+      "id": "99499208-a848-46f9-beca-23223f9bd43d",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-5-mini"
+        },
+        "builtInTools": {},
+        "options": {
+          "reasoningEffort": "low"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        192,
+        176
+      ],
+      "id": "08eff0b4-f654-4696-99c4-a51babef9de7",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "kkj14qnD4cBwY9wg",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Edit Fields').item.json.sessionId }}",
+        "contextWindowLength": "=5"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        448,
+        176
+      ],
+      "id": "e786c040-7fa5-4282-88fe-0f7bbd17695c",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolCalculator",
+      "typeVersion": 1,
+      "position": [
+        576,
+        176
+      ],
+      "id": "860b5970-877a-46d2-9651-a0f5d6f16860",
+      "name": "Calculator"
+    },
+    {
+      "parameters": {
+        "cityName": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('City', ``, 'string') }}"
+      },
+      "type": "n8n-nodes-base.openWeatherMapTool",
+      "typeVersion": 1,
+      "position": [
+        704,
+        176
+      ],
+      "id": "ddac6743-8f35-48a7-b129-262d966f4293",
+      "name": "OpenWeatherMap",
+      "credentials": {
+        "openWeatherMapApi": {
+          "id": "0OfxMOWf9hWkZhPh",
+          "name": "OpenWeatherMap account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "2f1df414-7205-40a1-b0c5-a5379c6ac125",
+              "name": "promptUser",
+              "value": "={{ $json.chatInput }}",
+              "type": "string"
+            },
+            {
+              "id": "76239cd7-78e8-4580-a3d1-93f9c8ba1d82",
+              "name": "promptSystem",
+              "value": "Jesteś pomocnym asystentem osobistym.  Odpowiadasz konkretnie, krótko i na temat. Jeśli czegoś nie wiesz lub nie potrafisz wykonać piszesz, że nie wiesz lub nie potrafisz. Używasz języka prostego i zrozumiałego. Bardziej skomplikowane pojęcia wyjaśniasz w prosty sposób i zwęźle. Używasz  języka polskiego.  \n\nMasz dostęp do narzędzi: \n- Calculator: obliczenia matematyczne \n- OpenWeatherMap: aktualna pogoda w mieście (bez prognozy na inne dni) - parametr do narzędzia to nazwa miejsca dla którego trzeba podać pogodę \n- mailAgent: do zarzadzania wiadomościami email. odczyt, wysyłanie, itp. ten agent wie z jakiego emaila wysyłać wiadomości. jako input jest parametr query jako polecenie dla sztucznej inteligencji. \n-Calendar_management: do zarzadzania kalendarzem\n\nJeśli pracujesz z odczytem wielu wiadomości zawsze w odpowiedzi umieść nagłówki tych wiadomości",
+              "type": "string"
+            },
+            {
+              "id": "02fb9a36-23f4-4197-8971-9611181746cb",
+              "name": "sessionId",
+              "value": "={{ $json.sessionId }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -32,
+        -48
+      ],
+      "id": "e672462d-7fda-4d78-8f99-eb510214f518",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-5-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-5-mini"
+        },
+        "builtInTools": {},
+        "options": {
+          "reasoningEffort": "high"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        320,
+        176
+      ],
+      "id": "9244270c-04bf-492c-ac57-2a1a12159151",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "kkj14qnD4cBwY9wg",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "66WiepNDdwJyBJtl",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/66WiepNDdwJyBJtl",
+          "cachedResultName": "Personal Agent Subworkflow Email Tool"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "query": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('query', ``, 'string') }}"
+          },
+          "matchingColumns": [
+            "query"
+          ],
+          "schema": [
+            {
+              "id": "query",
+              "displayName": "query",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        960,
+        160
+      ],
+      "id": "00792f6d-28fd-43a1-b065-1ba04620a8a8",
+      "name": "mailAgent"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "x5IsBKi6IuPHXvEo",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/x5IsBKi6IuPHXvEo",
+          "cachedResultName": "Personal Agent Subworkflow Calendar Tool"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "query": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('query', ``, 'string') }}"
+          },
+          "matchingColumns": [
+            "query"
+          ],
+          "schema": [
+            {
+              "id": "query",
+              "displayName": "query",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        832,
+        160
+      ],
+      "id": "a3e322a2-32fe-4a1b-804f-85f9d6606e75",
+      "name": "Calendar_management"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculator": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenWeatherMap": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "mailAgent": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calendar_management": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "3e40d889-6561-4b7b-aeba-efebf977c6c3",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "09373dc29972a821f2f36cf9017baede51510d6d820d175935c22f645f9e4095"
+  },
+  "id": "8-T1ov1PFmKn5O1yzj102",
+  "tags": []
+}
