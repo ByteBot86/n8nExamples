@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__n8n-mcp__get_node",
+      "mcp__n8n-mcp__search_templates",
+      "mcp__n8n-mcp__search_nodes",
+      "mcp__n8n-mcp__n8n_health_check",
+      "mcp__n8n-mcp__n8n_list_workflows"
+    ]
+  }
+}
